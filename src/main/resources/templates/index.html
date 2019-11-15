@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>主页</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- bootstrap-css -->
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<!--// bootstrap-css -->
+<!-- css -->
+<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+<!--// css -->
+<link rel="stylesheet" href="css/ken-burns.css">
+<!-- font-awesome icons -->
+<link href="css/font-awesome.css" rel="stylesheet"> 
+<!-- //font-awesome icons -->
+<!-- font -->
+<link href='https://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<!-- //font -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.js"></script>
+</head>
+<body>
+	<!-- banner -->
+	<div th:replace="~{templates/banner.html}">
+		<!--<div class="top-banner">
+			<div class="container">
+				<div class="top-banner-left">
+					<ul>
+						<li><i class="fa fa-phone" aria-hidden="true"></i> +1 234 567 8901</li>
+						<li><a href="mailto:example@email.com"><i class="fa fa-envelope" aria-hidden="true"></i> tmstarry@163.com</a></li>
+					</ul>
+				</div>
+				<div class="top-banner-right">
+					<ul>
+						<li><a class="facebook" href="/login">登录</a></li>
+						<li><a class="facebook" href="/login">注册</a></li>
+					</ul>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+		<div class="header">
+			<div class="container">
+				<div class="logo">
+					<h1>
+						<a href="index.html">TmStarry</a>
+					</h1>
+				</div>
+				<div class="top-nav">
+					<nav class="navbar navbar-default">
+							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">Menu						
+							</button>
+						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+							<ul class="nav navbar-nav">
+								<li><a class="active" href="/">首页</a></li>
+								<li><a href="about">关于我们</a></li>
+								<li><a href="services">服务</a></li>
+								<li><a href="codes">Codes</a></li>
+								<li><a href="gallery">景点</a></li>
+								<li><a href="contact">联系我们</a></li>
+								<div class="clearfix"></div>
+							</ul>	
+						</div>	
+					</nav>		
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>-->
+	</div>
+	<!-- //banner -->
+	<div id="kb" class="carousel kb_elastic animate_text kb_wrapper" data-ride="carousel" data-interval="6000" data-pause="hover">
+            <!-- Wrapper for Slides -->
+            <div class="carousel-inner" role="listbox">
+				<div class="item active">
+					<div class="slider slider">
+						<div class="carousel-caption kb_caption kb_caption_center slider-grid">
+							<h3><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">捷克</a></h3>
+							<p>无论日夜都有好景色的老桥，何时能重游。。。</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="item">
+					<div class="slider slider1">
+						<div class="carousel-caption kb_caption slider-grid">
+							<h3><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">哈尔斯塔特</a></h3>
+							<p>在传奇的萨尔茨卡默古特湖区的中心，壮丽的达赫斯坦的山脚下有一颗特别的明珠：历史文化与风景交融的哈尔斯塔特.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="item">
+					<div class="slider slider2">
+						<div class="carousel-caption kb_caption kb_caption_right slider-grid">
+							<h3><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">巴伐利亚</a></h3>
+							<p>喝着啤酒，感受欧洲最古老的钟楼.</p>
+						</div>
+					</div>
+				</div>
+
+            </div>
+            <!-- Navigation Buttons -->
+            <!-- Left Button -->
+            <a class="left carousel-control kb_control_left" href="#kb" role="button" data-slide="prev">
+                <span class="fa fa-angle-left kb_icons" aria-hidden="true"></span>
+                <span class="sr-only">上一个</span>
+            </a>
+            <!-- Right Button -->
+            <a class="right carousel-control kb_control_right" href="#kb" role="button" data-slide="next">
+                <span class="fa fa-angle-right kb_icons" aria-hidden="true"></span>
+                <span class="sr-only">下一个</span>
+            </a>
+    </div> 
+	<!-- about -->
+	<div class="about">
+		<div class="container">
+			<div class="w3l-about-heading">
+				<h2>最受欢迎</h2>
+				<p style="font-family: '华文行楷';font-size: 20px;">读万卷书，不如行万里路，路上自由风景如画，人生如书</P>
+			</div>
+			<div class="about-grids">
+				<div class="col-md-3 about-grid">
+					<div class="about-grid-info effect-1">
+						<h4><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">旧金山</a></h4>
+					</div>
+				</div>
+				<div class="col-md-3 about-grid">
+					<div class="about-grid-info about-grid-info1 effect-1" style="border-radius: 200px;">
+						<h4><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">马尔代夫</a></h4>
+					</div>
+				</div>
+				<div class="col-md-3 about-grid">
+					<div class="about-grid-info about-grid-info2 effect-1">
+						<h4><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">爱尔兰</a></h4>
+					</div>
+				</div>
+				<div class="col-md-3 about-grid">
+					<div class="about-grid-info about-grid-info3 effect-1">
+						<h4><a onclick="toInfo()" style="cursor:pointer;text-decoration: none;color: #fff">新西兰</a></h4>
+					</div>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>
+	<!-- offer -->
+	<div class="offer">
+		<div class="container">
+			<div class="wthree-offer-grid">
+				<h4>热门旅游区</h4>
+				<p>这里汇集了全国各地热门的旅游景区，并为您季节性建议旅游地，如果您近期有意旅游，不妨来我们的画廊，或许会给您带来惊喜. </p>
+				<div class="click-button">
+					<a href="gallery">去画廊</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //offer -->
+	<!-- news -->
+	<div class="news">
+		<div class="container">
+			<div class="news-heading">
+				<h3>最新旅游团</h3>
+				<p>我们即将出发，期待您的到来.</p>
+			</div>
+			<div class="news-grids">
+				<div class="col-md-4 news-grid" th:each="tourGroup,status:${tourGroups}">
+					<div class="agile-news-grid-info">
+						<div class="news-grid-info-img">
+							<a style="cursor:pointer;" th:onclick="toTourGroupInfo([[${tourGroup.tourGroupId}]])"><img th:src="'upload/'+${tourGroup.tourGroupImg}" alt="" style="width: 332px;height: 230px"/></a>
+						</div>
+						<div class="news-grid-info-bottom">
+							<div class="date-grid">
+								<div class="admin">
+									<a href="#"><i class="fa fa-user" aria-hidden="true"></i><a th:text="${tourGroup.userName}"></a></a>
+								</div>
+								<div class="time" style="float: right;margin-left: 0">
+									<p><i class="fa fa-calendar" aria-hidden="true"></i><a th:text="'出发：'+${#dates.format(tourGroup.chufaTime, 'yyyy-MM-dd')}"></a></p>
+								</div>
+								<div class="clearfix"> </div>
+							</div>
+							<div class="news-grid-info-bottom-text">
+								<a style="cursor:pointer;" th:onclick="toTourGroupInfo([[${tourGroup.tourGroupId}]])" th:text="${tourGroup.tourGroupName}"></a>
+								<p th:text="${tourGroup.tourGroupContent}"></p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+	<!-- //news -->
+	<!-- footer -->
+	<div th:replace="~{templates/footer.html}"></div>
+	<!-- //footer -->
+	<script src="js/SmoothScroll.min.js"></script>
+	<script type="text/javascript">
+		function toTourGroupInfo(tuorId) {
+			location.href="/toScenicSpotInfo?id=" + tuorId+"&type=tour";
+		}
+
+		window.onload = function (ev) {
+			//禁止F12
+			$("*").keydown(function (e) {//判断按键
+				e = window.event || e || e.which;
+				if (e.keyCode == 123) {
+					e.keyCode = 0;
+					return false;
+				}
+			});
+			//禁止审查元素
+			$(document).bind("contextmenu", function (e) {
+				return false;
+			});
+		}
+
+		function toInfo(scenicSpotId) {
+			location.href = "/toScenicSpotInfo?id=" + scenicSpotId+"&type=scenic";
+		}
+	</script>
+</body>	
+</html>

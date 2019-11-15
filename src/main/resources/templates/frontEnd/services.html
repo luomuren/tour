@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>服务</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- bootstrap-css -->
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<!--// bootstrap-css -->
+<!-- css -->
+<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+<!--// css -->
+<!-- font-awesome icons -->
+<link href="css/font-awesome.css" rel="stylesheet"> 
+<!-- //font-awesome icons -->
+<!-- font -->
+<link href='https://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<!-- //font -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<!-- parallax -->
+	<script src="js/SmoothScroll.min.js"></script>
+	<script src="js/jarallax.js"></script>
+	<!-- //parallax -->
+</head>
+<body>
+	<!-- banner -->
+<!--	<div class="banner about-bg">-->
+<!--		<div class="top-banner about-top-banner">-->
+<!--			<div class="container">-->
+<!--				<div class="top-banner-left">-->
+<!--					<ul>-->
+<!--						<li><i class="fa fa-phone" aria-hidden="true"></i> +1 234 567 8901</li>-->
+<!--						<li><a href="mailto:example@email.com"><i class="fa fa-envelope" aria-hidden="true"></i> mail@example.com</a></li>-->
+<!--					</ul>-->
+<!--				</div>-->
+<!--				<div class="top-banner-right">-->
+<!--					<ul>-->
+<!--						<li><a class="facebook" href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>-->
+<!--						<li><a class="facebook" href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>-->
+<!--						<li><a class="facebook" href="#"><i class="fa fa-dribbble" aria-hidden="true"></i></a></li>-->
+<!--						<li><a class="facebook" href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>-->
+<!--					</ul>-->
+<!--				</div>-->
+<!--				<div class="clearfix"> </div>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--		<div class="header">-->
+<!--			<div class="container">-->
+<!--				<div class="logo">-->
+<!--					<h1>-->
+<!--						<a href="index.html">My Trip</a>-->
+<!--					</h1>-->
+<!--				</div>-->
+<!--				<div class="top-nav">-->
+<!--					<nav class="navbar navbar-default">-->
+<!--							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">Menu						-->
+<!--							</button>-->
+<!--						&lt;!&ndash; Collect the nav links, forms, and other content for toggling &ndash;&gt;-->
+<!--						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">-->
+<!--							<ul class="nav navbar-nav">-->
+<!--								<li><a href="index.html">Home</a></li>-->
+<!--								<li><a href="about.html">About</a></li>-->
+<!--								<li><a class="active" href="services.html">Services</a></li>-->
+<!--								<li><a href="codes.html">Codes</a></li>	-->
+<!--								<li><a href="gallery.html">Gallery</a></li>-->
+<!--								<li><a href="contact.html">Contact</a></li>-->
+<!--								<div class="clearfix"> </div>-->
+<!--							</ul>	-->
+<!--						</div>	-->
+<!--					</nav>		-->
+<!--				</div>-->
+<!--				<div class="clearfix"> </div>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--	</div>-->
+	<!-- //banner -->
+	<div th:replace="~{templates/banner1.html}"></div>
+	<!-- a-about -->
+	<div class="a-grid">
+		<div class="container">
+			<div class="w3l-about-heading">
+				<h2>项目简介</h2>
+<!--				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras porta efficitur ante quis volutpat.</p>-->
+			</div>
+			<div class="agileits-services-grids">
+				<div class="col-md-6 w3l-services-grid">
+					<div class="services-grid-info">
+						<h4>主要技术：</h4>
+						<p>框架：spring-bootMVC</p>
+						<p>数据库：mybatis</p>
+						<p>前端模版：thymeleaf</p>
+						<p>权限控制：shiro</p>
+					</div>
+					<div class="services-grid-info">
+						<h4>旅游项目：</h4>
+						<p>管理员：管理用户及系统信息</p>
+						<p>导游：发布景点信息及旅游团信息，吸引用户</p>
+						<p>用户：查看旅游景点及旅游团详情信息，加入旅游团，与导游互相联系确定旅游事宜</p>
+					</div>
+				</div>
+				<div class="col-md-6 w3l-services-grid">
+					<div class="services-grid-info">
+						<h4>捎带技术：</h4>
+						<p>前台页面布局：bootstrap </p>
+						<p>后台页面布局：EasyUi </p>
+						<p>邮件发送：mail+freemarker </p>
+					</div>
+                    <div class="services-grid-info">
+                        <h4>酒店项目：</h4>
+                        <p>用户登录：登录的用户可对相应的酒店信息进行评论 </p>
+                        <p>用户未登录：为了方便用户快捷、有效的预订酒店，只需提供正确的入住人姓名(该姓名与酒店实际入住人的身份证信息相符)、手机号码，电子邮箱即可，系统会以短信的方式向用户发送预订信息。完成预定后，用户可以在线支付，也可以到店支付 </p>
+                    </div>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>
+	<!-- //a-about -->
+	<script type="text/javascript">
+        /* init Jarallax */
+        $('.jarallax').jarallax({
+            speed: 0.5,
+            imgWidth: 1366,
+            imgHeight: 768
+        })
+    </script>
+	<div th:replace="~{templates/footer.html}"></div>
+</body>
+<script type="text/javascript">
+	window.onload=function (ev) {
+		$(".active").attr("class",'');
+		$("a[href=services]").attr("class", 'active');
+	}
+</script>
+</html>

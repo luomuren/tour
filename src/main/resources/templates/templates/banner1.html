@@ -1,0 +1,45 @@
+<div class="banner about-bg">
+    <div class="top-banner">
+        <div class="container">
+            <div class="top-banner-left">
+                <ul>
+                    <li><i class="fa fa-phone" aria-hidden="true"></i> +1 234 567 8901</li>
+                    <li><a href="mailto:example@email.com"><i class="fa fa-envelope" aria-hidden="true"></i>
+                        tmstarry@163.com</a></li>
+                </ul>
+            </div>
+            <div class="top-banner-right">
+                <ul th:if="${session.userName==null}">
+                    <li><a class="facebook" href="/login" target="_blank">登录/注册</a></li>
+                </ul>
+                <ul th:if="${session.userName!=null}">
+                    <li><a class="facebook" th:text="${session.userName}"></a></li>
+                </ul>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <div class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>
+                    <a href="/">TmStarry</a>
+                </h1>
+            </div>
+            <div class="top-nav">
+                <nav class="navbar navbar-default">
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li><a class="active" href="/">首页</a></li>
+                            <li><a href="about">关于我们</a></li>
+                            <li><a href="services">服务</a></li>
+                            <li><a href="gallery">景点</a></li>
+                            <div class="clearfix"></div>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>

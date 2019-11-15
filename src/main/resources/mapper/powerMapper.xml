@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.power.dao.IPowerDao">
+    <resultMap id="powerMap" type="top.tmstarry.tour.power.service.bean.Power">
+        <id property="powerId" column="power_id"/>
+        <result property="url" column="url"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+    </resultMap>
+
+    <sql id="colums">
+        ${alias}.power_id,${alias}.url,${alias}.creat_time,
+        ${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="powerId">
+            select last_insert_id()
+        </selectKey>
+        insert into power (url, creat_time,creat_user,up_time,up_user)
+        values (#{url},#{creatTime},#{creatUser},#{upTime},#{upUser})
+    </insert>
+    <update id="update">
+        update power
+        <set>
+            <if test="bean.url!=null">url=#{bean.url}</if>
+        </set>
+        where power_id=#{id}
+    </update>
+    <!--循环批量删除，有删库风险-->
+    <delete id="delete">
+        delete from power
+        <where>
+            <foreach collection="array" index="index" item="powerId"
+                     open="(" separator="or" close=")">
+                power_id=#{powerId}
+            </foreach>
+        </where>
+    </delete>
+    <!--检索单条数据-->
+    <select id="selectOne" resultMap="powerMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="power"/>
+        </include>
+        from power where power_id=#{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectList" resultMap="powerMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="power" />
+        </include>
+        from power
+        <where>
+            <if test="url!=null and ''!=url">
+                <bind name="nameLike" value="'%' + _parameter.get('url') + '%'" />
+                url like #{nameLike}
+            </if>
+        </where>
+        <if test="sort!=null">
+            order by #{sort}
+            <if test="order!=null">
+                #{order}
+            </if>
+        </if>
+        <include refid="pager.mysql_pager" />
+    </select>
+    <!--总记录条数-->
+    <select id="listCount" resultType="int">
+        select
+        count(power_id)
+        from power
+        <where>
+            <if test="url!=null and ''!=url">
+                <bind name="nameLike" value="'%' + _parameter.get('url') + '%'" />
+                url like #{nameLike}
+            </if>
+            <if test="powerId!=null and powerId!=0">
+                or power_id=#{powerId}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getPowerByRole" resultMap="powerMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="power" />
+        </include>
+        from role inner join role_power on role.role_id=role_power.roled_id
+        inner join power on role_power.power_id=power.power_id
+        where role.role_id=#{roleId}
+    </select>
+
+    <delete id="delPowerByRoleId">
+        delete from role_power
+        where roled_id=#{id}
+    </delete>
+    <insert id="addRolePower">
+        insert into role_power (roled_id,power_id) values (#{roleId},#{powerId})
+    </insert>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.comment.dao.ICommentDao">
+    <resultMap id="commentMap" type="top.tmstarry.tour.comment.service.bean.Comment">
+        <id property="commentId" column="comment_id"/>
+        <result property="commentUser" column="comment_user"/>
+        <result property="commentContent" column="comment_content"/>
+        <result property="userName" column="user_name"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+    </resultMap>
+
+    <sql id="colums">
+        ${alias}.comment_id,${alias}.comment_user,${alias}.comment_content,${alias}.creat_time,
+        ${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="commentId">
+            select last_insert_id()
+        </selectKey>
+        insert into comment (comment_user,comment_content, creat_time,creat_user,up_time,up_user)
+        values (#{commentUser},#{commentContent},#{creatTime},#{creatUser},#{upTime},#{upUser})
+    </insert>
+    <update id="update">
+        update comment
+        <set>
+            <if test="bean.commentUser!=null">comment_content=#{bean.commentContent}</if>,
+        </set>
+        where comment_id=#{id}
+    </update>
+    <!--循环批量删除，有删库风险-->
+    <delete id="delete">
+        delete from comment
+        <where>
+            <foreach collection="array" index="index" item="commentId"
+                     open="(" separator="or" close=")">
+                comment_id=#{commentId}
+            </foreach>
+        </where>
+    </delete>
+    <!--检索单条数据-->
+    <select id="selectOne" resultMap="commentMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="comment"/>
+        </include>
+        from comment where comment_id=#{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectList" resultMap="commentMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="comment"/>
+        </include>
+        from comment
+        <where>
+            <if test="commentUser!=null and ''!=commentUser">
+                <bind name="nameLike" value="'%' + _parameter.get('commentUser') + '%'"/>
+                commentUser like #{nameLike}
+            </if>
+            <if test="commentContent!=null and ''!=commentContent">
+                <bind name="nameLike" value="'%' + _parameter.get('commentContent') + '%'"/>
+                or commentContent like #{nameLike}
+            </if>
+        </where>
+        <if test="sort!=null">
+            order by #{sort}
+            <if test="order!=null">
+                #{order}
+            </if>
+        </if>
+        <include refid="pager.mysql_pager"/>
+    </select>
+    <!--总记录条数-->
+    <select id="listCount" resultType="int">
+        select
+        count(comment_id)
+        from comment
+        <where>
+            <if test="commentUser!=null and ''!=commentUser">
+                <bind name="nameLike" value="'%' + _parameter.get('commentUser') + '%'"/>
+                commentUser like #{nameLike}
+            </if>
+            <if test="commentContent!=null and ''!=commentContent">
+                <bind name="nameLike" value="'%' + _parameter.get('commentContent') + '%'"/>
+                or commentContent like #{nameLike}
+            </if>
+        </where>
+    </select>
+
+    <select id="getCommentByScenic" resultMap="commentMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="comment"/>
+        </include>,user.user_name
+        from
+comment inner join comment_scenic cs on comment.comment_id = cs.comment_id
+inner join scenicspot s on cs.scenic_id = s.scenic_spot_id
+inner join user on comment.comment_user=user.user_id
+and s.scenic_spot_id=#{id}
+    </select>
+    <select id="getCommentByTour" resultMap="commentMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="comment"/>
+        </include>,user.user_name
+        from
+        comment inner join comment_tour ct on comment.comment_id = ct.comment_id
+        inner join tourgroup t on t.tour_group_id=ct.tour_id
+        inner join user on comment.comment_user=user.user_id
+        where t.tour_group_id=#{id}
+    </select>
+    
+    <insert id="addCommentScenic">
+        insert into comment_scenic (comment_id,scenic_id) values (#{commentId},#{scenicId})
+    </insert>
+    <insert id="addCommentTour">
+        insert into comment_tour (comment_id,tour_id) values (#{commentId},#{tourId})
+    </insert>
+</mapper>

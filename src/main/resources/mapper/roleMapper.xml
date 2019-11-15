@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.role.dao.IRoleDao">
+    <resultMap id="roleMap" type="top.tmstarry.tour.role.service.bean.Role">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+    </resultMap>
+
+    <sql id="roleColums">
+        ${alias}.role_id,${alias}.role_name,${alias}.creat_time,
+        ${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="roleId">
+            select last_insert_id()
+        </selectKey>
+        insert into role (role_name, creat_time,creat_user,up_time,up_user)
+        values (#{roleName},#{creatTime},#{creatUser},#{upTime},#{upUser})
+    </insert>
+    <update id="update">
+        update role
+        <set>
+            <if test="bean.roleName!=null">role_name=#{bean.roleName}</if>
+        </set>
+        where role_id=#{id}
+    </update>
+    <!--循环批量删除，有删库风险-->
+    <delete id="delete">
+        delete from role
+        <where>
+            <foreach collection="array" index="index" item="roleId"
+                     open="(" separator="or" close=")">
+                role_id=#{roleId}
+            </foreach>
+        </where>
+    </delete>
+    <!--检索单条数据-->
+    <select id="selectOne" resultMap="roleMap">
+        select
+        <include refid="roleColums">
+            <property name="alias" value="role"/>
+        </include>
+        from role where role_id=#{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectList" resultMap="roleMap">
+        select
+        <include refid="roleColums">
+            <property name="alias" value="role" />
+        </include>
+        from role
+        <where>
+            <if test="roleName!=null and ''!=roleName">
+                <bind name="nameLike" value="'%' + _parameter.get('roleName') + '%'" />
+                role_name like #{nameLike}
+            </if>
+        </where>
+        <if test="sort!=null">
+            order by #{sort}
+            <if test="order!=null">
+                #{order}
+            </if>
+        </if>
+        <include refid="pager.mysql_pager" />
+    </select>
+    <!--总记录条数-->
+    <select id="listCount" resultType="int">
+        select
+        count(role_id)
+        from role
+        <where>
+            <if test="roleName!=null and ''!=roleName">
+                <bind name="nameLike" value="'%' + _parameter.get('roleName') + '%'" />
+                role_name like #{nameLike}
+            </if>
+            <if test="roleId!=null and roleId!=0">
+                or role_id=#{roleId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getRoleByUser" resultMap="roleMap">
+        select
+        <include refid="roleColums">
+            <property name="alias" value="r" />
+        </include>
+        from user inner join user_role ur on user.user_id = ur.user_id
+        inner join role r on ur.role_id = r.role_id
+        where user.user_id=#{userId}
+    </select>
+
+    <delete id="delRoleByUserId">
+        delete from user_role
+        where user_id=#{userId}
+    </delete>
+    <insert id="addUserRole">
+        insert into user_role (user_id,role_id) values (#{userId},#{roleId})
+    </insert>
+</mapper>

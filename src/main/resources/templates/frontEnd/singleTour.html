@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>评论</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    } </script>
+    <!-- bootstrap-css -->
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all"/>
+    <!--// bootstrap-css -->
+    <!-- css -->
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="all"/>
+    <!--// css -->
+    <!-- font-awesome icons -->
+    <link href="css/font-awesome.css" rel="stylesheet">
+    <!-- //font-awesome icons -->
+    <!-- font -->
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <!-- //font -->
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <!-- parallax -->
+    <script src="js/SmoothScroll.min.js"></script>
+    <!-- //parallax -->
+</head>
+<body>
+<div th:replace="~{templates/banner1.html}"></div>
+<!-- blog -->
+<div class="blog">
+    <!-- container -->
+    <div class="container">
+        <div class="col-md-8 blog-top-left-grid">
+            <div class="left-blog left-single">
+                <div class="blog-left">
+                    <!--或者旅行团-->
+                    <div class="single-left-left">
+                        <p>导游： <a href="#" th:text="${bean.userName}"></a> &nbsp;&nbsp; <a style="color: #000000"
+                                                                                             th:text="${#dates.format(bean.creatTime,'yyyy-MM-dd')}"></a>
+                            &nbsp;&nbsp; <a href="#comBox">人数 (<a style="color: #000000" th:text="${bean.tourGroupNum}"></a>)</a>
+                        </p>
+                        <!--<img th:src="'upload/'+${bean.tourGroupImg}" alt=""/>-->
+                        <div id="myCarousel" class="carousel slide">
+                            <!-- 轮播（Carousel）指标 -->
+                            <ol class="carousel-indicators">
+                                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                                <li data-target="#myCarousel" data-slide-to="1"></li>
+                                <li data-target="#myCarousel" data-slide-to="2"></li>
+                            </ol>
+                            <!-- 轮播（Carousel）项目 -->
+                            <div class="carousel-inner">
+                                <div class="item active" th:if="${imgs.size()>=0}">
+                                    <img th:src="'upload/'+${imgs.get(0)}" alt=""/>
+                                </div>
+                                <div class="item" th:if="${imgs.size()>1}">
+                                    <img th:src="'upload/'+${imgs.get(1)}" alt=""/>
+                                </div>
+                                <div class="item" th:if="${imgs.size()>2}">
+                                    <img th:src="'upload/'+${imgs.get(2)}" alt=""/>
+                                </div>
+                            </div>
+                            <!-- 轮播（Carousel）导航 -->
+                            <a class="carousel-control left" href="#myCarousel"
+                               data-slide="prev">&lsaquo;</a>
+                            <a class="carousel-control right" href="#myCarousel"
+                               data-slide="next">&rsaquo;</a>
+                        </div>
+                    </div>
+                    <div class="blog-left-bottom">
+                        <P style="text-indent: 2em" th:text="${bean.tourGroupContent}">
+                        </P>
+                    </div>
+                </div>
+                <div class="response" id="comBox">
+                    <h3>讨论：</h3>
+                    <div id="commentBox">
+                        <div th:each="com,status:${comment}" class="media response-info">
+                            <div class="media-left response-text-left">
+                                <a>
+                                    <img class="media-object" src="easyUI/images/logo.png" alt="">
+                                </a>
+                                <h5><a href="#" th:text="${com.userName}"></a></h5>
+                            </div>
+                            <div class="media-body response-text-right">
+                                <p th:text="${com.commentContent}"></p>
+                                <ul>
+                                    <li th:text="${#dates.format(com.creatTime,'yyyy-MM-dd')}"></li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="opinion">
+                    <form onsubmit="return false">
+                        <textarea id="comment" placeholder="评论。。。" required=""></textarea>
+                        <input type="text" id="tourId" th:value="${bean.tourGroupId}" style="display: none">
+                        <input type="submit" value="提交" onclick="submitComment()">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 blog-top-right-grid">
+            <div class="categories" id="lvtInfo">
+                <h3 th:if="${isJoin==false||isJoin==null}"><a style="cursor:pointer;" th:onclick="addLVT([[${bean.tourGroupId}]])">加入旅游团</a></h3>
+                <ul th:if="${isJoin==true}" class="marked-list offs1">
+                    <li><a th:text="'旅游团：'+${bean.tourGroupName}"></a></li>
+                    <li><a th:text="'出发时间：'+${bean.chufaTime}"></a></li>
+                    <li><a th:text="'导游：'+${bean.userName}"></a></li>
+                    <li><a th:href="'email:'+${guide.email}" th:text="'邮箱：'+${guide.email}"></a></li>
+                </ul>
+            </div>
+            <div class="categories">
+                <h3><a href="">相关酒店推荐</a></h3>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- //container -->
+</div>
+<!-- //blog -->
+<div th:replace="~{templates/footer.html}"></div>
+<script type="text/javascript">
+    function submitComment() {
+        var comment = $("#comment").val();
+        var tourId = $("#tourId").val();
+        $.post("/comment/addComTour", {commentContent: comment, tourId: tourId}, function (data) {
+            if(data==null||data=='') {
+                alert("请先登录!");
+            } else {
+                addComment(data);
+            }
+        });
+    }
+
+    function addComment(data) {
+        var str='<div class="media response-info">\n' +
+            '    <div class="media-left response-text-left">\n' +
+            '        <a href="#">\n' +
+            '            <img class="media-object" src="easyUI/images/logo.png" alt="">\n' +
+            '        </a>\n' +
+            '        <h5><a href="#">'+data.creatUser+'</a></h5>\n' +
+            '    </div>\n' +
+            '    <div class="media-body response-text-right">\n' +
+            '        <p>'+data.commentContent+'</p>\n' +
+            '        <ul>\n' +
+            '            <li>'+data.creatTime+'</li>\n' +
+            '        </ul>\n' +
+            '    </div>\n' +
+            '    <div class="clearfix"></div>\n' +
+            '</div>';
+        $("#commentBox").append(str);
+        $("#tourId").val('');
+    }
+
+    function addLVT(id) {
+        if(confirm("您确认已经做好旅游准备并加入该旅游团吗？")) {
+            $.post("/tourGroup/joinTour", {id: id}, function (data) {
+                if (data == false) {
+                    alert("请登录候重试！");
+                } else {
+                    alert("恭喜您成功加入该旅游团，导游稍后将联系您确认信息，请您做好旅游前的准备！");
+                    var str = '<ul class="marked-list offs1">\n' +
+                        '    <li><a>旅游团：[[${bean.tourGroupName}]]</a></li>\n' +
+                        '    <li><a>出发时间：[[${bean.chufaTime}]]</a></li>\n' +
+                        '    <li><a>导游：[[${bean.userName}]]</a></li>\n' +
+                        '    <li><a href="mailto: [[${guide.email}]]">mailto:[[${guide.email}]]</a></li>\n' +
+                        '</ul>';
+                    $("#lvtInfo").html(str);
+                }
+            });
+        }
+    }
+    window.onload=function (ev) {
+        $(".active").attr("class",'');
+        $("a[href=gallery]").attr("class", 'active');
+    }
+</script>
+</body>
+</html>

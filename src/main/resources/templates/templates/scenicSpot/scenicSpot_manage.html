@@ -1,0 +1,341 @@
+<style type="text/css">
+</style>
+<table id="scenic_manage_table" class="easyui-datagrid" title="景点管理" style="height:auto"
+       data-options="
+            rowNumbers:true,
+            toolbar: '#scenic_manage_tb',
+            url: '/scenicSpot',
+            method: 'get',collapsible:true,
+            onDblClickCell: sceniconDblClickRow,
+            onEndEdit: sceniconEndEdit,fit:true,fitColumns:true,remoteSort:false,multiSort:true,pagination:true">
+    <thead>
+    <tr>
+        <th data-options="field:'ck',checkbox:true"></th>
+        <th data-options="field:'scenicSpotId',sortable:true">景点Id</th>
+        <th data-options="field:'scenicSpotName',sortable:true,
+                editor:'textbox',required:true">景点名
+        </th>
+        <th data-options="field:'scenicSpotContent',align:'right',editor:'textarea',sortable:true">景点简介</th>
+        <th data-options="field:'scenicSpotImg',align:'center',formatter:function(value){
+            return '<img src='+'/upload/'+value+' style='+'width:60px;height:50px'+'/>'
+        }">景点图片(双击预览,双击Id修改)</th>
+        <th data-options="field:'classId',align:'right',formatter:function(value,row){
+							return row.className;
+						},editor:{
+						    type:'combobox',
+							options:{
+							    editable:false,
+								valueField:'classId',
+								textField:'className',
+								method:'get',
+								url:'/scenicSpotClass/getList',
+								required:true
+							}
+						}">景点类型</th>
+        <th data-options="field:'address',align:'right',editor:'textbox'">景点地址</th>
+        <th data-options="field:'creatTime',align:'right',sortable:true,formatter:formatTime">创建时间</th>
+        <th data-options="field:'creatUser',align:'right',sortable:true">创建用户</th>
+        <th data-options="field:'upTime',align:'right',sortable:true,formatter:formatTime">修改时间</th>
+        <th data-options="field:'upUser',align:'right',sortable:true">修改用户</th>
+    </tr>
+    </thead>
+</table>
+
+<div id="scenic_manage_tb" style="height:auto">
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-add',plain:true"
+       onclick="scenicappend()">新增</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-delete',plain:true"
+       onclick="scenicremoveit()">删除</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-tick',plain:true"
+       onclick="scenicaccept()">保存</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true"
+       onclick="scenicreject()">撤销全部操作</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-refresh',plain:true"
+       onclick="scenicload()">刷新</a>
+</div>
+
+<div id="scenicwd" class="easyui-window" title="新增景点" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:600px;height:500px;padding:10px;">
+    <div class="easyui-panel" title="Register" style="padding:30px 60px" data-options="fit:true">
+        <form id="scenicAddForm" method="post" enctype="multipart/form-data"></form>
+        <div style="margin-bottom:20px">
+            <input id="scenicSpotName" class="easyui-textbox" label="景点名:" labelposition="left" data-options="prompt:'请输入景点名'" style="width:100%;height:50px">
+        </div>
+        <div style="margin-bottom:20px">
+            <textarea id="scenicSpotContent" style="width:95%;height:200px;padding: 10px 10px" placeholder="景点详情"></textarea>
+        </div>
+        <div style="margin-bottom:20px">
+            景点图片：<input type="file" name="scenicimg" id="scenicimg">
+        </div>
+        <div style="margin-bottom:20px">
+            景点类型：<input class="easyui-combobox" style="width:100%;height:52px" id="classId" placeholder="项目类型"
+                   data-options="
+                   editable:false,
+					valueField:'classId',
+					textField:'className',
+					panelHeight:'auto'">
+        </div>
+        <div style="margin-bottom:20px">
+            <input id="address" class="easyui-textbox" label="景点地址:" labelposition="left" data-options="prompt:'请输入景点地址'" style="width:100%;height:52px">
+        </div>
+        <div>
+            <input type="button" onclick="scenicsubmit()" class="easyui-linkbutton" style="width:100%;height:32px" value="提交"/>
+        </div>
+    </div>
+</div>
+<div id="scenicupImgBox" class="easyui-window" title="修改景点图片" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:400px;height:400px;padding:10px;">
+    <div class="easyui-panel" style="padding:60px 60px" data-options="fit:true">
+        <form id="scenicupform" method="post" enctype="multipart/form-data"></form>
+        <div style="margin-bottom:50px">
+            景点图片：<input type="file" name="scenicimgupimg" id="scenicimgupimg">
+        </div>
+        <div>
+            <input type="button" onclick="scenicupsubmit()" class="easyui-linkbutton" style="width:100%;height:32px" value="提交"/>
+        </div>
+    </div>
+</div>
+<div id="scenicShowImgBox" class="easyui-window" title="图片预览" data-options="modal:true,closed:true,iconCls:'icon-save'" style="width:900px;height:600px;padding:10px;">
+    <div class="easyui-panel" style="padding:60px 60px" data-options="fit:true">
+        <div style="margin-bottom:50px">
+            <img id="showImg" src="" alt="" style="max-width: 800px;max-height: 800px">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var id='';
+
+    function scenicupsubmit() {
+        var scenicformData = new FormData();
+        scenicformData.append('upimg',document.getElementById('scenicimgupimg').files[0]);
+        scenicformData.append('id',id);
+        $.ajax({
+            type:'put',
+            url:'/scenicSpot/up',
+            data:scenicformData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+                $('#scenicupImgBox').window('open');
+                alert("修改成功");
+                $('#scenicupImgBox').window('close');
+                $('#scenic_manage_table').datagrid('load');
+            }
+        });
+    }
+    function scenicsubmit() {
+        var scenicformDataformData = new FormData();
+        var name = $("#scenicSpotName").val();
+        var content = $("#scenicSpotContent").val();
+        var classId = $("#classId").val();
+        var address = $("#address").val();
+        scenicformDataformData.append('img',document.getElementById('scenicimg').files[0]);
+        scenicformDataformData.append('scenicSpotName', name);
+        scenicformDataformData.append('scenicSpotContent', content);
+        scenicformDataformData.append("classId", classId);
+        scenicformDataformData.append("address", address);
+        $.ajax({
+            type:'post',
+            url:'/scenicSpot/add',
+            data:scenicformDataformData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+                alert("添加成功");
+                $('#scenicwd').window('close');
+                setTimeout(function () {
+                    $('#scenic_manage_table').datagrid('load');
+                }, 1000);
+            }
+        });
+    }
+
+    //user_manage
+    var editIndex = undefined;
+    //结束编辑
+    function scenicEndEditing() {
+        if (editIndex == undefined) {
+            return true;
+        }
+        if ($('#scenic_manage_table').datagrid('validateRow', editIndex)) {
+            $('#scenic_manage_table').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function sceniconDblClickRow(index, field,value) {
+        if (field == "scenicSpotImg") {
+            $('#scenicShowImgBox').window('open');
+            $("#showImg").attr("src","/upload/"+value);
+        }
+        if (field == "scenicSpotId") {
+            $('#scenicupImgBox').window('open');
+            id = value;
+        }
+
+        if (editIndex != index) {
+            if (scenicEndEditing()) {
+                $('#scenic_manage_table').datagrid('selectRow', index)
+                    .datagrid('beginEdit', index);
+                var ed = $('#scenic_manage_table').datagrid('getEditor', {index: index, field: field});
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndex = index;
+            } else {
+                setTimeout(function () {
+                    $('#scenic_manage_table').datagrid('selectRow', editIndex);
+                }, 0);
+            }
+        }
+    }
+    function sceniconEndEdit(index, row) {
+        var ed = $(this).datagrid('getEditor', {
+            index: index,
+            field: 'classId'
+        });
+        row.className = $(ed.target).combobox('getText');
+    }
+    //新增
+    function scenicappend() {
+        $('#scenicwd').window('open');
+        $('#classId').combobox({
+            url:'/scenicSpotClass/getList',
+            method:'get'
+        });
+    }
+    <!--删除-->
+    function scenicremoveit() {
+        var rows = $('#scenic_manage_table').datagrid("getSelections");
+
+        for (var i = 0; i < rows.length; i++) {
+            var index = $('#scenic_manage_table').datagrid("getRowIndex", rows[i]);
+            $('#scenic_manage_table').datagrid('cancelEdit', index)
+                .datagrid('deleteRow', index);
+        }
+    }
+    //保存
+    function scenicaccept() {
+        $.messager.confirm('提示！', '保存后不可撤销，是否保存?', function (r) {
+            if (r) {
+                var isUp = true;
+                if (scenicEndEditing()) {
+                    /*<!--添加-->
+                    var insrows = $('#scenic_manage_table').datagrid('getChanges', 'inserted');
+                    var insValueRows = new Array();
+                    if (insrows.length > 0) {
+                        for (var i = 0; i < insrows.length; i++) {
+                            var scenicSpotName = insrows[i].scenicSpotName;
+                            var scenicSpotContent = insrows[i].scenicSpotContent;
+                            var scenicSpotImg = insrows[i].scenicSpotImg;
+                            var classId = insrows[i].classId;
+                            if (scenicSpotName == ""||classId=="") {
+                                $.messager.alert('提示！', '新增数据中有字段为空，请完善后保存!', 'warning');
+                                isIns = false;
+                            }else {
+                                var scenic = new Object();
+                                scenic.scenicSpotName = scenicSpotName;
+                                scenic.scenicSpotContent = scenicSpotContent;
+                                scenic.scenicSpotImg = scenicSpotImg;
+                                scenic.classId = classId;
+                                insValueRows[i] = scenic;
+                            }
+                        }
+                        if (isIns) {
+                            $.post("/scenicSpot/addBatch", {bean: JSON.stringify(insValueRows)}, function (data) {
+                                if (data == true) {
+                                    $.messager.alert('提示！', '新增数据保存成功!新用户请在第一次登录时设置密码', 'success');
+                                    isFlus = true;
+                                } else {
+                                    $.messager.alert('提示！', '新增数据出错，请检查数据库!', 'error');
+                                }
+                            });
+                        } else {
+                            $.messager.alert('提示！', '发生错误！取消新增操作', 'error');
+                        }
+
+                    }*/
+                    <!--修改-->
+                    var scenicuprows = $('#scenic_manage_table').datagrid('getChanges', 'updated');
+                    var scenicupScenicRows = new Array();
+                    var upScenicIds = '';
+                    if (scenicuprows.length > 0) {
+                        for (var i = 0; i < scenicuprows.length; i++) {
+                            var scenicSpotId = scenicuprows[i].scenicSpotId;
+                            var scenicSpotName = scenicuprows[i].scenicSpotName;
+                            var scenicSpotContent = scenicuprows[i].scenicSpotContent;
+                            var classId = scenicuprows[i].classId;
+                            if (scenicSpotName == ""||classId=="") {
+                                $.messager.alert('提示！', '修改数据中有字段为空，无法完成修改操作保存!', 'warning');
+                                isUp = false;
+                            }else {
+                                var scenic = new Object();
+                                scenic.scenicSpotName = scenicSpotName;
+                                scenic.scenicSpotContent = scenicSpotContent;
+                                scenic.classId = classId;
+                                scenicupScenicRows[i] = scenic;
+                            }
+                            upScenicIds = upScenicIds + scenicSpotId + ',';
+                        }
+                        if (isUp) {
+                            console.log("提交");
+                            $.ajax({
+                                type: 'put',
+                                url: '/scenicSpot/upBatch',
+                                data: {bean: JSON.stringify(scenicupScenicRows), ids: upScenicIds},
+                                dataType: 'json',
+                                success: function (data) {
+                                    if (data == true) {
+                                        $.messager.alert('提示！', '修改数据保存成功!', 'success');
+                                    } else {
+                                        $.messager.alert('提示！', '保存修改数据出错，请检查数据库!', 'error');
+                                    }
+                                }
+                            });
+                        } else {
+                            $.messager.alert('提示！', '发生错误！取消修改操作！', 'error');
+                        }
+
+                    }
+                    <!--删除-->
+                    var scenicdeletes = $('#scenic_manage_table').datagrid('getChanges', 'deleted');
+                    var scenicids = '';
+                    for (var i = 0; i < scenicdeletes.length; i++) {
+                        if (scenicdeletes[i] != null) {
+                            scenicids = scenicids + scenicdeletes[i].scenicSpotId + ',';
+                        }
+                    }
+                    if (scenicids != '') {
+                        $.ajax({
+                            type: 'delete',
+                            url: '/scenicSpot',
+                            data: {ids: scenicids},
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data == true) {
+                                    $.messager.alert('提示！', '数据删除成功!', 'success');
+                                } else {
+                                    $.messager.alert('提示！', '数据删除失败！请检查数据库!', 'error');
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+    //撤销
+    function scenicreject() {
+        $('#scenic_manage_table').datagrid('rejectChanges');
+        editIndex = undefined;
+    }
+    //刷新
+    function scenicload() {
+        $.messager.confirm('提示！', '将从数据库重新加载数据，是否继续？', function (r) {
+            if (r) {
+                $('#scenic_manage_table').datagrid('load');
+            }
+        });
+    }
+</script>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.tourGroup.dao.ITourGroupDao">
+    <resultMap id="tourGroupMap" type="top.tmstarry.tour.tourGroup.service.bean.TourGroup">
+        <id property="tourGroupId" column="tour_group_id"/>
+        <result property="tourGroupName" column="tour_group_name"/>
+        <result property="lineId" column="line_id"/>
+        <result property="lineName" column="line_name"/>
+        <result property="guide" column="guide"/>
+        <result property="userName" column="user_name"/>
+        <result property="tourGroupNum" column="tour_group_num"/>
+        <result property="tourGroupContent" column="tour_group_content"/>
+        <result property="tourGroupImg" column="tour_group_img"/>
+        <result property="chufaTime" column="chufa_time"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+    </resultMap>
+
+    <sql id="colums">
+        ${alias}.tour_group_id,${alias}.tour_group_name,${alias}.line_id,
+        ${alias}.guide,${alias}.tour_group_num,${alias}.tour_group_content,${alias}.tour_group_img,${alias}.chufa_time,
+        ${alias}.creat_time,${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="tourGroupId">
+            select last_insert_id()
+        </selectKey>
+        insert into tourgroup (tour_group_name,line_id,guide,tour_group_num,tour_group_content,tour_group_img,chufa_time, creat_time,creat_user,up_time,up_user)
+        values (#{tourGroupName},#{lineId},#{guide},#{tourGroupNum},#{tourGroupContent},#{tourGroupImg},#{chufaTime},#{creatTime},#{creatUser},#{upTime},#{upUser})
+    </insert>
+    <update id="update">
+        update tourgroup
+        <set>
+            <if test="bean.tourGroupName!=null">tour_group_name=#{bean.tourGroupName},</if>
+            <if test="bean.lineId!=null and bean.lineId!=0">line_id=#{bean.lineId},</if>
+            <if test="bean.guide!=null and bean.guide!=0">guide=#{bean.guide},</if>
+            <if test="bean.tourGroupNum!=null">tour_group_num=#{bean.tourGroupNum},</if>
+            <if test="bean.tourGroupContent!=null and bean.tourGroupContent!=''">tour_group_content=#{bean.tourGroupContent},</if>
+            <if test="bean.tourGroupImg!=null and bean.tourGroupImg!=''">tour_group_img=#{bean.tourGroupImg},</if>
+            <if test="bean.chufaTime!=null">chufa_time=#{bean.chufaTime}</if>
+        </set>
+        where tour_group_id=#{id}
+    </update>
+    <!--循环批量删除，有删库风险-->
+    <delete id="delete">
+        delete from tourgroup
+        <where>
+            <foreach collection="array" index="index" item="tourGroupId"
+                     open="(" separator="or" close=")">
+                tour_group_id=#{tourGroupId}
+            </foreach>
+        </where>
+    </delete>
+    <!--检索单条数据-->
+    <select id="selectOne" resultMap="tourGroupMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="tourgroup"/>
+        </include>,user.user_name
+        from tourgroup,user where tourgroup.guide=user.user_id and tour_group_id=#{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectList" resultMap="tourGroupMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="tourgroup" />
+        </include>,line.line_name,user.user_name
+        from tourgroup,line,user
+        <where>
+            tourgroup.line_id=line.line_id and user.user_id=tourgroup.guide
+            <if test="tourGroupName!=null and ''!=tourGroupName">
+                <bind name="nameLike" value="'%' + _parameter.get('tourGroupName') + '%'" />
+                and tour_group_name like #{nameLike}
+            </if>
+            <if test="lineId!=null and ''!=lineId">
+                and line_id=#{lineId}
+            </if>
+            <if test="guide!=null and ''!=guide">
+               and guide= #{guide}
+            </if>
+        </where>
+        <if test="sort!=null">
+            order by #{sort}
+            <if test="order!=null">
+                #{order}
+            </if>
+        </if>
+        <include refid="pager.mysql_pager" />
+    </select>
+    <!--总记录条数-->
+    <select id="listCount" resultType="int">
+        select
+        count(tour_group_id)
+        from tourgroup
+        <where>
+            <if test="tourGroupName!=null and ''!=tourGroupName">
+                <bind name="nameLike" value="'%' + _parameter.get('tourGroupName') + '%'" />
+                tour_group_name like #{nameLike}
+            </if>
+            <if test="lineId!=null and ''!=lineId">
+                line_id= #{lineId}
+            </if>
+            <if test="guide!=null and ''!=guide">
+                guide= #{guide}
+            </if>
+        </where>
+    </select>
+
+    <select id="getTourByScenic" resultMap="tourGroupMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="t"/>
+        </include>
+        from
+        scenicspot inner join line_scenics on scenicspot.scenic_spot_id=line_scenics.scenics_id
+        inner join tourgroup t on line_scenics.line_id = t.line_id
+        where scenicspot.scenic_spot_id=#{id}
+    </select>
+
+    <select id="getScenicImgByTour" resultType="java.lang.String">
+        select scenic_spot_img
+from
+tourgroup inner join line l on tourgroup.line_id = l.line_id
+inner join line_scenics ls on l.line_id = ls.line_id
+inner join scenicspot on scenicspot.scenic_spot_id=ls.scenics_id
+where tourgroup.tour_group_id=#{id}
+    </select>
+
+
+    <update id="upTourNum">
+        update tourgroup set tour_group_num=tour_group_num+1 where tour_group_id=#{id}
+    </update>
+
+    <insert id="joinTour">
+        insert into user_tour (user_id,tour_id) values (#{userId},#{tourId})
+    </insert>
+
+    <select id="getIsJoinTour" resultMap="tourGroupMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="tourgroup"/>
+        </include>
+        from
+        tourgroup inner join user_tour on tourgroup.tour_group_id=user_tour.tour_id
+        inner join user u on user_tour.user_id = u.user_id
+        where u.user_id=#{userId} and tourgroup.tour_group_id=#{tourId}
+    </select>
+</mapper>

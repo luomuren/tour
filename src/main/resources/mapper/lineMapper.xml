@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.line.dao.ILineDao">
+    <resultMap id="lineMap" type="top.tmstarry.tour.line.service.bean.Line">
+        <id property="lineId" column="line_id"/>
+        <result property="lineName" column="line_name"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+        <collection property="scenicSpots" resultMap="top.tmstarry.tour.scenicSpot.dao.IScenicSpotDao.scenicSpotMap">
+        </collection>
+    </resultMap>
+
+    <sql id="column">
+        ${alias}.line_id,${alias}.line_name,${alias}.creat_time,
+        ${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="lineId">
+            select last_insert_id()
+        </selectKey>
+        insert into line (line_name, creat_time, up_time, creat_user, up_user)
+        values (#{lineName},#{creatTime},#{upTime},#{creatUser},#{upUser});
+    </insert>
+    <update id="update">
+        update line
+        <set>
+            <if test="lineName!=null">line_name=#{lineName}</if>,
+        </set>
+        where line_id=#{lineId}
+    </update>
+    <delete id="delete">
+        delete from line
+        <where>
+            <foreach collection="array" index="index" item="lineId"
+                     open="(" separator="or" close=")">
+                line_id=#{lineId}
+            </foreach>
+        </where>
+    </delete>
+    <select id="getList" resultMap="lineMap">
+        select
+        <include refid="column">
+            <property name="alias" value="line"/>
+        </include>
+        ,sc.scenic_spot_id,sc.scenic_spot_name
+        from line inner join line_scenics ls on line.line_id = ls.line_id
+        inner join scenicspot sc on ls.scenics_id=sc.scenic_spot_id
+        <where>
+            <if test="lineId!=null">
+                and line.line_id=#{lineId}
+            </if>
+            <if test="lineName!=null">
+                and line_name=#{lineName}
+            </if>
+        </where>
+    </select>
+    <select id="getOne" resultMap="lineMap">
+        select
+        <include refid="column">
+            <property name="alias" value="line"/>
+        </include>
+        ,sc.scenic_spot_id,sc.scenic_spot_name
+        from line inner join line_scenics ls on line.line_id = ls.line_id
+        inner join scenicspot sc on ls.scenics_id=sc.scenic_spot_id
+        where line.line_id=#{lineId}
+    </select>
+
+    <select id="getLineScenic" resultMap="top.tmstarry.tour.scenicSpot.dao.IScenicSpotDao.scenicSpotMap">
+        select scenicspot.* from
+scenicspot inner join line_scenics ls on ls.scenics_id=scenicspot.scenic_spot_id
+inner join line l on ls.line_id = l.line_id
+where l.line_id=#{lineId}
+    </select>
+
+    <insert id="insertLineScenic">
+        insert into line_scenics (scenics_id, line_id) values (#{scenicsId},#{lineId})
+    </insert>
+    <delete id="deleteLineScenic">
+        delete from line_scenics
+        <where>
+            <foreach collection="array" index="index" item="lineId"
+                     open="(" separator="or" close=")">
+                line_id=#{lineId}
+            </foreach>
+        </where>
+    </delete>
+
+    <insert id="addLs">
+        insert into line_scenics (scenics_id, line_id) values (#{sId},#{lineId})
+    </insert>
+</mapper>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.scenicSpot.dao.IScenicSpotDao">
+    <resultMap id="scenicSpotMap" type="top.tmstarry.tour.scenicSpot.service.bean.ScenicSpot">
+        <id property="scenicSpotId" column="scenic_spot_id"/>
+        <result property="scenicSpotName" column="scenic_spot_name"/>
+        <result property="scenicSpotContent" column="scenic_spot_content"/>
+        <result property="scenicSpotImg" column="scenic_spot_img"/>
+        <result property="classId" column="class_id"/>
+        <result property="className" column="class_name"/>
+        <result property="address" column="address"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+    </resultMap>
+
+    <sql id="colums">
+        ${alias}.scenic_spot_id,${alias}.scenic_spot_name,${alias}.scenic_spot_content,${alias}.scenic_spot_img,${alias}.class_id,${alias}.address,
+        ${alias}.creat_time,${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="scenicSpotId">
+        select last_insert_id()
+        </selectKey>
+        insert into scenicspot (scenic_spot_name, scenic_spot_content, scenic_spot_img,class_id,address, creat_time,creat_user,up_time,up_user)
+        values (#{scenicSpotName},#{scenicSpotContent},#{scenicSpotImg},#{classId},#{address},#{creatTime},#{creatUser},#{upTime},#{upUser})
+    </insert>
+    <update id="update">
+        update scenicspot
+        <set>
+            <if test="bean.scenicSpotName!=null">scenic_spot_name=#{bean.scenicSpotName},</if>
+            <if test="bean.scenicSpotContent!=null">scenic_spot_content=#{bean.scenicSpotContent},</if>
+            <if test="bean.scenicSpotImg!=null">scenic_spot_img=#{bean.scenicSpotImg},</if>
+            <if test="bean.classId!=null">class_id=#{bean.classId},</if>
+            <if test="bean.address!=null">address=#{bean.address},</if>
+        </set>
+        where scenic_spot_id=#{id}
+    </update>
+    <!--循环批量删除，有删库风险-->
+    <delete id="delete">
+        delete from scenicspot
+        <where>
+            <foreach collection="array" index="index" item="scenicSpotId"
+                     open="(" separator="or" close=")">
+            scenic_spot_id=#{scenicSpotId}
+            </foreach>
+        </where>
+    </delete>
+    <!--检索单条数据-->
+    <select id="selectOne" resultMap="scenicSpotMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="scenicspot"/>
+        </include>
+        from scenicspot where scenic_spot_id=#{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectList" resultMap="scenicSpotMap">
+        select
+        <include refid="colums">
+            <property name="alias" value="scenicspot" />
+        </include>,scenicspotclass.class_name
+        from scenicspot,scenicspotclass
+        <where>
+            scenicspot.class_id=scenicspotclass.class_id
+            <if test="scenicSpotName!=null and ''!=scenicSpotName">
+                <bind name="nameLike" value="'%' + _parameter.get('scenicSpotName') + '%'" />
+                and scenic_spot_name like #{nameLike}
+            </if>
+            <if test="scenicSpotId!=null and scenicSpotId!=0">
+                and scenic_spot_id=#{scenicSpotId}
+            </if>
+            <if test="scenicSpotContent!=null and ''!=scenicSpotContent">
+                <bind name="nameLike" value="'%' + _parameter.get('scenicSpotContent') + '%'" />
+                and scenic_spot_content like #{nameLike}
+            </if>
+            <if test="classId!=null">
+                or class_id=#{classId}
+            </if>
+        </where>
+        <if test="sort!=null">
+            order by #{sort}
+            <if test="order!=null">
+                #{order}
+            </if>
+        </if>
+        <include refid="pager.mysql_pager" />
+    </select>
+    <!--总记录条数-->
+    <select id="listCount" resultType="int">
+        select
+        count(scenic_spot_id)
+        from scenicspot
+        <where>
+            <if test="scenicSpotName!=null and ''!=scenicSpotName">
+                <bind name="nameLike" value="'%' + _parameter.get('scenicSpotName') + '%'" />
+                scenic_spot_name like #{nameLike}
+            </if>
+            <if test="scenicSpotId!=null and scenicSpotId!=0">
+                or scenic_spot_id=#{scenicSpotId}
+            </if>
+            <if test="scenicSpotContent!=null and ''!=scenicSpotContent">
+                <bind name="nameLike" value="'%' + _parameter.get('scenicSpotContent') + '%'" />
+                or scenic_spot_content like #{nameLike}
+            </if>
+            <if test="classId!=null">
+                or class_id=#{classId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

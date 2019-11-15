@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>评论</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <script type="application/x-javascript"> addEventListener("load", function () {
+        setTimeout(hideURLbar, 0);
+    }, false);
+
+    function hideURLbar() {
+        window.scrollTo(0, 1);
+    } </script>
+    <!-- bootstrap-css -->
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all"/>
+    <!--// bootstrap-css -->
+    <!-- css -->
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="all"/>
+    <!--// css -->
+    <!-- font-awesome icons -->
+    <link href="css/font-awesome.css" rel="stylesheet">
+    <!-- //font-awesome icons -->
+    <!-- font -->
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <!-- //font -->
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <!-- parallax -->
+    <script src="js/SmoothScroll.min.js"></script>
+    <!-- //parallax -->
+</head>
+<body>
+<div th:replace="~{templates/banner1.html}"></div>
+<!-- blog -->
+<div class="blog">
+    <!-- container -->
+    <div class="container">
+        <div class="col-md-8 blog-top-left-grid">
+            <div class="left-blog left-single">
+                <div class="blog-left">
+                    <!--或者旅行团-->
+                    <div class="single-left-left">
+                        <p>发布人： <a href="#" th:text="${bean.creatUser}"></a> &nbsp;&nbsp; <a style="color: #000000"
+                                                                                             th:text="${#dates.format(bean.creatTime,'yyyy-MM-dd')}"></a>
+                            &nbsp;&nbsp; <a href="#comBox">评论 (<a style="color: #000000" th:text="${commentCount}"></a>)</a>
+                        </p>
+                        <img th:src="'upload/'+${bean.scenicSpotImg}" alt=""/>
+                    </div>
+                    <div class="blog-left-bottom">
+                        <P style="text-indent: 2em" th:text="${bean.scenicSpotContent}">
+                        </P>
+                    </div>
+                </div>
+                <div class="response" id="comBox">
+                    <h3>讨论：</h3>
+                    <div id="commentBox">
+                        <div th:each="com,status:${comment}" class="media response-info">
+                            <div class="media-left response-text-left">
+                                <a href="#">
+                                    <img class="media-object" src="easyUI/images/logo.png" alt="">
+                                </a>
+                                <h5><a href="#" th:text="${com.userName}"></a></h5>
+                            </div>
+                            <div class="media-body response-text-right">
+                                <p th:text="${com.commentContent}"></p>
+                                <ul>
+                                    <li th:text="${#dates.format(com.creatTime,'yyyy-MM-dd')}"></li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="opinion">
+                    <form onsubmit="return false">
+                        <textarea id="comment" placeholder="评论。。。" required=""></textarea>
+                        <input type="text" id="scenicId" th:value="${bean.scenicSpotId}" style="display: none">
+                        <input type="submit" value="提交" onclick="submitComment()">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 blog-top-right-grid">
+            <div class="categories">
+                <h3>其他景点</h3>
+                <ul>
+                    <li th:each="other,status:${otherScenic}"><a style="cursor:pointer;" th:onclick="toInfo([[${other.scenicSpotId}]])" th:text="${other.scenicSpotName}"></a></li>
+                </ul>
+            </div>
+            <div class="categories">
+                <h3>相关旅游团</h3>
+                <ul class="marked-list offs1">
+                    <li th:each="tour,status:${tours}"><a style="cursor:pointer;" th:onclick="toTourInfo([[${tour.tourGroupId}]])" th:text="${tour.tourGroupName}"></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- //container -->
+</div>
+<!-- //blog -->
+<div th:replace="~{templates/footer.html}"></div>
+<script type="text/javascript">
+    function submitComment() {
+        var comment = $("#comment").val();
+        var scenicId = $("#scenicId").val();
+        $.post("/comment/addComSc", {commentContent: comment, scenicId: scenicId}, function (data) {
+            console.log(data);
+            if(data==null||data=='') {
+                alert("请先登录!");
+            } else {
+                addComment(data);
+            }
+        });
+    }
+
+    function addComment(data) {
+        var str='<div class="media response-info">\n' +
+            '    <div class="media-left response-text-left">\n' +
+            '        <a href="#">\n' +
+            '            <img class="media-object" src="easyUI/images/logo.png" alt="">\n' +
+            '        </a>\n' +
+            '        <h5><a href="#">'+data.creatUser+'</a></h5>\n' +
+            '    </div>\n' +
+            '    <div class="media-body response-text-right">\n' +
+            '        <p>'+data.commentContent+'</p>\n' +
+            '        <ul>\n' +
+            '            <li>'+data.creatTime+'</li>\n' +
+            '        </ul>\n' +
+            '    </div>\n' +
+            '    <div class="clearfix"></div>\n' +
+            '</div>';
+        $("#commentBox").append(str);
+        $("#scenicId").val('');
+    }
+
+    function toInfo(scenicSpotId) {
+        location.href = "/toScenicSpotInfo?id=" + scenicSpotId+"&type=scenic";
+    }
+    function toTourInfo(tourId) {
+        location.href = "/toScenicSpotInfo?id=" + tourId + "&type=tour";
+    }
+    window.onload=function (ev) {
+        $(".active").attr("class",'');
+        $("a[href=gallery]").attr("class", 'active');
+    }
+</script>
+</body>
+</html>

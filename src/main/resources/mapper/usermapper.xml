@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.tmstarry.tour.user.dao.IUserDao">
+    <resultMap id="usermap" type="top.tmstarry.tour.user.service.bean.User">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+        <result property="guide" column="guide"/>
+    </resultMap>
+    <resultMap id="userInfoMap" type="top.tmstarry.tour.user.service.bean.UserInfo">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="realName" column="real_name"/>
+        <result property="sex" column="sex"/>
+        <result property="QQ" column="qq"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="creatUser" column="creat_user"/>
+        <result property="upTime" column="up_time"/>
+        <result property="upUser" column="up_user"/>
+    </resultMap>
+    
+    <sql id="userColums">
+        ${alias}.user_id,${alias}.user_name,${alias}.password,${alias}.email,${alias}.creat_time,
+        ${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+    <sql id="userInfoColums">
+        ${alias}.user_id,${alias}.real_name,${alias}.sex,${alias}.QQ,${alias}.creat_time,
+        ${alias}.up_time,${alias}.creat_user,${alias}.up_user
+    </sql>
+
+    <insert id="insert">
+        <selectKey resultType="int" order="AFTER" keyProperty="userId">
+        select last_insert_id()
+        </selectKey>
+        insert into user (user_name, password, email, creat_time,creat_user,up_time,up_user)
+        values (#{userName},#{password},#{email},#{creatTime},#{creatUser},#{upTime},#{upUser})
+    </insert>
+    <update id="update">
+        update user
+        <set>
+            <if test="bean.userName!=null">user_name=#{bean.userName},</if>
+            <if test="bean.password!=null">password=#{bean.password},</if>
+            <if test="bean.email!=null">email=#{bean.email}</if>
+        </set>
+        where user_id=#{id}
+    </update>
+    <!--循环批量删除，有删库风险-->
+    <delete id="delete">
+        delete from user
+        <where>
+            <foreach collection="array" index="index" item="userId"
+                     open="(" separator="or" close=")">
+            user_id=#{userId}
+            </foreach>
+        </where>
+    </delete>
+    <!--检索单条数据-->
+    <select id="selectOne" resultMap="usermap">
+        select
+        <include refid="userColums">
+            <property name="alias" value="user"/>
+        </include>
+        from user where user_id=#{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectList" resultMap="usermap">
+        select
+        <include refid="userColums">
+            <property name="alias" value="user" />
+        </include>
+        from user
+        <where>
+            <if test="userName!=null and ''!=userName">
+                <bind name="nameLike" value="'%' + _parameter.get('userName') + '%'" />
+                user_name like #{nameLike}
+            </if>
+            <if test="userId!=null and userId!=0">
+                or user_id=#{userId}
+            </if>
+        </where>
+        <if test="sort!=null">
+            order by #{sort}
+            <if test="order!=null">
+                #{order}
+            </if>
+        </if>
+        <include refid="pager.mysql_pager" />
+    </select>
+    <!--总记录条数-->
+    <select id="listCount" resultType="int">
+        select
+        count(user_id)
+        from user
+        <where>
+            <if test="userName!=null and ''!=userName">
+                <bind name="nameLike" value="'%' + _parameter.get('userName') + '%'" />
+                user_name like #{nameLike}
+            </if>
+            <if test="userId!=null and userId!=0">
+                or user_id=#{userId}
+            </if>
+        </where>
+    </select>
+
+
+    <!--userInfo-->
+    <insert id="insertUserInfo">
+        insert into userinfo (user_id,creat_time,creat_user,up_time,up_user) values
+         (#{userId},#{creatTime},#{creatUser},#{upTime},#{upUser});
+    </insert>
+
+
+    <!--登录用-->
+    <select id="getUser" resultMap="usermap">
+        select
+        <include refid="userColums">
+            <property name="alias" value="user"/>
+        </include>
+        from user
+        where user_name=#{userName}
+    </select>
+    <!--检索用户身份-->
+    <!--参数：userName-->
+    <select id="selectRoles" resultType="java.lang.String">
+        select r.role_name
+        from user inner join user_role ur on user.user_id = ur.user_id
+        inner join role r on ur.role_id = r.role_id
+        where user.user_name=#{userName}
+    </select>
+    <!--检索用户权限-->
+    <!--参数：userName-->
+    <select id="selectPermissions" resultType="java.lang.String">
+        select url
+        from user
+         inner join user_role ur on user.user_id = ur.user_id
+         inner join role r on ur.role_id = r.role_id
+         inner join role_power rp on r.role_id = rp.roled_id
+         inner join power p on rp.power_id = p.power_id
+        where user.user_name = #{userName}
+    </select>
+
+    <select id="getGuide" resultMap="usermap">
+        select user.user_name,userinfo.*,user.user_id guide from
+        userinfo inner join user on userinfo.user_id=user.user_id
+        inner join user_role ur on user.user_id = ur.user_id
+        inner join role r on ur.role_id = r.role_id
+        where r.role_name='导游'
+    </select>
+
+    <select id="getAGuide" resultMap="userInfoMap">
+        select
+        <include refid="userInfoColums">
+            <property name="alias" value="userinfo" />
+        </include>,user_name
+        from
+        userinfo inner join user on userinfo.user_id=user.user_id
+        where user.user_id=#{id}
+    </select>
+</mapper>
