@@ -18,7 +18,7 @@
         <java.version>1.8</java.version>
         <org.apache.shiro-version>1.4.1</org.apache.shiro-version>
         <swagger-verson>2.8.0</swagger-verson>
-        <commons-fileupload-version>1.3.1</commons-fileupload-version>
+        <commons-fileupload-version>1.3.3</commons-fileupload-version>
     </properties>
 
     <dependencies>
